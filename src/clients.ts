@@ -1,22 +1,26 @@
 import * as azdev from "azure-devops-node-api";
 import * as tl from "azure-devops-node-api/TaskApi";
+import * as c from "azure-devops-node-api/CoreApi";
+import preferences from "./utils/preferences";
 
 // your collection url
-const orgName = process.env.AZURE_ORG_NAME?.toLowerCase() || "";
-const orgUrl = `https://dev.azure.com/${orgName}`;
-const token: string = process.env.AZURE_PERSONAL_ACCESS_TOKEN || "";
+const orgUrl = `https://dev.azure.com/${preferences.orgName.toLowerCase()}`;
 
-if (!orgName) {
-  throw new Error("ENV VAR AZURE_ORG_NAME is not set");
+if (!preferences.orgName) {
+  throw new Error("ENV VAR ORG NAME is not set");
 }
 
-if (!token) {
-  throw new Error("ENV VAR AZURE_PERSONAL_ACCESS_TOKEN is not set");
+if (!preferences.token) {
+  throw new Error("ENV VAR PAT is not set");
 }
 
-const authHandler = azdev.getPersonalAccessTokenHandler(token);
+const authHandler = azdev.getPersonalAccessTokenHandler(preferences.token);
 const connection = new azdev.WebApi(orgUrl, authHandler);
 
 export async function getTaskAPI(): Promise<tl.ITaskApi> {
   return await connection.getTaskApi();
+}
+
+export async function getCoreAPI(): Promise<c.ICoreApi> {
+  return await connection.getCoreApi();
 }
